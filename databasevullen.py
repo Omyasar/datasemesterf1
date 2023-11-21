@@ -129,3 +129,268 @@ def migrate_driverstandings_data():
         conn.close()
 
 
+def migrate_circuits_data():
+    conn, cursor = db_connection()
+
+    # Transformeer de data
+    transformed_data = []
+    for data in mongo_circuits.find():
+        transformed_data.append((
+            data['_id'],
+            data['circuitId'],
+            data['circuitRef'],
+            data['name'],
+            data['location'],
+            data['country'],
+            data['lat'],
+            data['lng'],
+            data['alt'] if data['alt'] != '\\N' else None,
+            data['url']
+        ))
+
+    # Laad de data in PostgreSQL
+    try:
+        cursor.executemany(
+            """
+            INSERT INTO circuits (
+                _id, circuit_id, circuit_ref, name, location, country,
+                lat, lng, alt, url
+            )
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            """,
+            transformed_data
+        )
+        conn.commit()
+    except Exception as e:
+        print(f"Data migratie fout: {e}")
+        conn.rollback()
+
+
+# Transformeert en laad de drivers data naar postgres
+def migrate_drivers_data():
+    conn, cursor = db_connection()
+
+    # Transformeer de data
+    transformed_data = []
+    for data in mongo_drivers.find():
+        transformed_data.append((
+            data['_id'],
+            data['driverId'],
+            data['driverRef'],
+            data['number'],
+            data['code'],
+            data['forename'],
+            data['surname'],
+            data['dob'],
+            data['nationality'],
+            data['url']
+        ))
+
+    # Laad de data in PostgreSQL
+    try:
+        cursor.executemany(
+            """
+            INSERT INTO drivers (
+                _id, driverid, driverref, number, code, forename,
+                surname, dob, nationality, url
+            )
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            """,
+            transformed_data
+        )
+        conn.commit()
+    except Exception as e:
+        print(f"Data migratie fout: {e}")
+        conn.rollback()
+    finally:
+        cursor.close()
+        conn.cursor()
+
+
+# Transformeert en laad de lap times data naar postgres
+def lap_times_data():
+    conn, cursor = db_connection()
+
+    # Tranformeer de data
+    transformed_data = []
+    for data in mongo_lap_times.find():
+        transformed_data.append((
+            data['_id'],
+            data['raceId'],
+            data['driverId'],
+            data['lap'],
+            data['position'],
+            data['time'],
+            data['milliseconds'],
+        ))
+    try:
+        cursor.executemany(
+            """
+            INSERT INTO lap_times (
+                _id, raceid, driverid, lap, position, time, milliseconds
+            )
+            VALUES (%s, %s, %s, %s, %s, %s,%s)
+            """,
+            transformed_data
+        )
+        conn.commit()
+    except Exception as e:
+        print(f"Data migratie fout: {e}")
+        conn.rollback()
+    finally:
+        cursor.close()
+        conn.close()
+
+
+# transformeert en laad de lap times data naar postgres
+def pit_stops_data():
+    conn, cursor = db_connection()
+
+    # Tranformeer de data
+    transformed_data = []
+    for data in mongo_pit_stops.find():
+        transformed_data.append((
+            data['_id'],
+            data['raceId'],
+            data['driverId'],
+            data['stop'],
+            data['lap'],
+            data['time'],
+            data['duration'],
+            data['milliseconds'],
+        ))
+    try:
+        cursor.executemany(
+            """
+            INSERT INTO pit_stops (
+                _id, raceid, driverid, stop, lap, time,duration, milliseconds
+            )
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+            """,
+            transformed_data
+        )
+        conn.commit()
+    except Exception as e:
+        print(f"Data migratie fout: {e}")
+        conn.rollback()
+    finally:
+        cursor.close()
+        conn.close()
+
+
+# Transformeert en laad de qualifying data naar postgres
+def qualifying_data():
+    conn, cursor = db_connection()
+
+    # Tranformeer de data
+    transformed_data = []
+    for data in mongo_qualifying.find():
+        transformed_data.append((
+            data['_id'],
+            data['qualifyId'],
+            data['raceId'],
+            data['driverId'],
+            data['constructorId'],
+            data['number'],
+            data['position'],
+            data.get('q1', None),
+            data.get('q2', None),
+            data.get('q3', None)
+        ))
+    try:
+        cursor.executemany(
+            """
+            INSERT INTO qualifying (
+                _id, qualifyid, raceid, driverid, constructorId, number,position, q1, q2, q3
+            )
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            """,
+            transformed_data
+        )
+        conn.commit()
+    except Exception as e:
+        print(f"Data migratie fout: {e}")
+        conn.rollback()
+    finally:
+        cursor.close()
+        conn.close()
+
+
+# Transformeert en laad de races data
+def races_data():
+    conn, cursor = db_connection()
+
+    # Tranformeer de data
+    transformed_data = []
+    for data in mongo_races.find():
+        transformed_data.append((
+            data['_id'],
+            data['raceId'],
+            data['year'],
+            data['round'],
+            data['circuitId'],
+            data['name'],
+            data['date'],
+            data['time'] if data['time'] != '\\N' else None,
+            data['url']
+        ))
+    try:
+        cursor.executemany(
+            """
+            INSERT INTO races (
+                _id, raceId, year, round, circuitId, name, date, time, url
+            )
+            VALUES (%s, %s, %s, %s, %s, %s,%s,%s, %s)
+            """,
+            transformed_data
+        )
+        conn.commit()
+    except Exception as e:
+        print(f"Data migratie fout: {e}")
+        conn.rollback()
+
+
+# Transformeert en laad de results data
+def results():
+    conn, cursor = db_connection()
+
+    # Tranformeer de data
+    transformed_data = []
+    for data in mongo_results.find():
+        transformed_data.append((
+            data['_id'],
+            data.get('resultId', None),
+            data['raceId'],
+            data.get('driverId'),
+            data.get('constructorId', None),
+            data.get('number', None),
+            data.get('grid', None),
+            data.get('position', None) if data.get('position', None) != '\\N' else None,
+            data.get('positionText'),
+            data.get('points', None),
+            data.get('time', None) if data.get('time', None) != '\\N' else None,
+            data.get('milliseconds', None) if data.get('milliseconds', None) != '\\N' else None,
+            data.get('fastestLap') if data.get('fastestLap', None) != '\\N' else None,
+            data.get('rank') if data.get('rank', None) != '\\N' else None,
+            data.get('fastestLapTime') if data.get('fastestLapTime', None) != '\\N' else None,
+            data.get('fastestLapSpeed') if data.get('FastestLapSpeed', None) != '\\N' else None,
+            data.get('statusId') if data.get('statusId', None) != '\\N' else None
+        ))
+    try:
+        cursor.executemany(
+            """
+            INSERT INTO results (
+                _id, resultId, raceId,driverid, constructorId, number, grid, position,positiontext, points, time,milliseconds,
+                fastestlap, rank, fastestLapTime,FastestLapSpeed,statusId
+
+            )
+            VALUES (%s, %s, %s, %s, %s, %s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+            """,
+            transformed_data
+        )
+        conn.commit()
+    except Exception as e:
+        print(f"Data migratie fout: {e}")
+        conn.rollback()
+
+
