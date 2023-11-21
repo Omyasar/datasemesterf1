@@ -52,4 +52,80 @@ def migrate_constructorresults():
         conn.rollback()
 
 
+def migrate_constructorstands():
+    conn, cursor = db_connection()
+
+    # Tranformeer de data
+    transformed_data = []
+    for data in mongo_constructor_standings.find():
+        transformed_data.append((
+            data['_id'],
+            data['constructorStandingsId'],
+            data['raceId'],
+            data['constructorId'],
+            data['points'] if data['points'] != '\\N' else None,
+            data['position'],
+            data['positionText'],
+            data['wins'] if data['wins'] != '\\N' else None
+        ))
+    try:
+        cursor.executemany(
+            """
+            INSERT INTO constructor_standings (
+                _id, constructorStandingsid, raceid, constructorid, points,position, position_text, wins
+            )
+            VALUES (%s, %s, %s, %s, %s, %s,%s,%s)
+            """,
+            transformed_data
+        )
+        conn.commit()
+    except Exception as e:
+        print(f"Data migratie fout: {e}")
+        conn.rollback()
+
+
+# Transformeert en laad de driverstandings data naar postgres
+def migrate_driverstandings_data():
+    conn, cursor = db_connection()
+
+    # Tranformeer de data
+    transformed_data = []
+    for data in mongo_driver_standings.find():
+        transformed_data.append((
+            data['_id'],
+            data['driverStandingsId'],
+            data['raceId'],
+            data['driverId'],
+            data['points'] if data['points'] != '\\N' else None,
+            data['position'],
+            data['positionText'],
+            data['wins'] if data['wins'] != '\\N' else None
+        ))
+    try:
+        cursor.executemany(
+            """
+            INSERT INTO driver_standings (
+                _id, driverStandingsId, raceid, driverid, points,position, positiontext, wins
+            )
+            VALUES (%s, %s, %s, %s, %s, %s,%s,%s)
+            ON CONFLICT (_id)
+            DO UPDATE SET
+                driverStandingsId = EXCLUDED.driverStandingsId,
+                raceid = EXCLUDED.raceid,
+                driverid = EXCLUDED.driverid,
+                points = EXCLUDED.points,
+                position = EXCLUDED.position,
+                positiontext = EXCLUDED.positiontext,
+                wins = EXCLUDED.wins;
+            """,
+            transformed_data
+        )
+        conn.commit()
+    except Exception as e:
+        print(f"Data migratie fout: {e}")
+        conn.rollback()
+    finally:
+        cursor.close()
+        conn.close()
+
 
