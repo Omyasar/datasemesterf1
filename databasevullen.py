@@ -393,4 +393,69 @@ def results():
         print(f"Data migratie fout: {e}")
         conn.rollback()
 
+def status_data():
+    conn, cursor = db_connection()
 
+    # Tranformeer de data
+    transformed_data = []
+    for data in mongo_status.find():
+        transformed_data.append((
+            data['_id'],
+            data['statusId'],
+            data['status'],
+        ))
+    try:
+        cursor.executemany(
+            """
+            INSERT INTO status (
+                _id, statusId, status
+            )
+            VALUES (%s, %s, %s)
+            """,
+            transformed_data
+        )
+        conn.commit()
+    except Exception as e:
+        print(f"Data migratie fout: {e}")
+        conn.rollback()
+
+def season_data():
+    conn, cursor = db_connection()
+
+    # Tranformeer de data
+    transformed_data = []
+    for data in mongo_season_list.find():
+        transformed_data.append((
+            data['_id'],
+            data['year'],
+            data['url'],
+        ))
+    try:
+        cursor.executemany(
+            """
+            INSERT INTO season_list (
+                _id, year, url
+            )
+            VALUES (%s, %s, %s)
+            """,
+            transformed_data
+        )
+        conn.commit()
+    except Exception as e:
+        print(f"Data migratie fout: {e}")
+        conn.rollback()
+
+
+if __name__ == "__main__":
+    season_data()
+    status_data()
+    results()
+    races_data()
+    qualifying_data()
+    pit_stops_data()
+    lap_times_data()
+    migrate_drivers_data()
+    migrate_circuits_data()
+    migrate_driverstandings_data()
+    migrate_constructorstands()
+    migrate_constructorresults()
