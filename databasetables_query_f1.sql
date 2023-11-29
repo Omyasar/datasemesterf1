@@ -102,7 +102,18 @@ create table races(
     name VARCHAR(255),
     date DATE,
     time TIME NULL,
-    url varchar(255)
+    url varchar(255),
+    fp1_date varchar(255),
+    fp1_time varchar(255),
+    fp2_date varchar(255),
+    fp2_time varchar(255),
+    fp3_date varchar(255),
+    fp3_time varchar(255),
+    quali_date varchar(255),
+    quali_time varchar(255),
+    sprint_date varchar(255),
+    sprint_time varchar(255)
+
 );
 
 CREATE TABLE results (

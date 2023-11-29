@@ -332,15 +332,25 @@ def races_data():
             data['name'],
             data['date'],
             data['time'] if data['time'] != '\\N' else None,
-            data['url']
-        ))
+            data['url'],
+            data.get('fp1_date', None),
+            data.get('fp1_time', None),
+            data.get('fp2_date', None),
+            data.get('fp2_time', None),
+            data.get('fp3_date', None),
+            data.get('fp3_time', None),
+            data.get('quali_date', None),
+            data.get('quali_time', None),
+            data.get('sprint_date', None),
+            data.get('sprint_time', None)
+            ))
     try:
         cursor.executemany(
             """
             INSERT INTO races (
-                _id, raceId, year, round, circuitId, name, date, time, url
+                _id, raceId, year, round, circuitId, name, date, time, url, fp1_date, fp1_time, fp2_date, fp2_time, fp3_date, fp3_time, quali_date, quali_time, sprint_date, sprint_time
             )
-            VALUES (%s, %s, %s, %s, %s, %s,%s,%s, %s)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s ,%s, %s, %s,%s,%s, %s, %s, %s)
             """,
             transformed_data
         )
@@ -488,15 +498,4 @@ def season_data():
 
 
 if __name__ == "__main__":
-    season_data()
-    status_data()
-    results()
     races_data()
-    qualifying_data()
-    pit_stops_data()
-    lap_times_data()
-    migrate_drivers_data()
-    migrate_circuits_data()
-    migrate_driverstandings_data()
-    migrate_constructorstands()
-    migrate_constructorresults()
