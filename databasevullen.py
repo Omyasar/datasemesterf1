@@ -351,6 +351,46 @@ def races_data():
 
 
 # Transformeert en laad de results data
+def sprint_results():
+    conn, cursor = db_connection()
+
+    # Tranformeer de data
+    transformed_data = []
+    for data in mongo_results.find():
+        transformed_data.append((
+            data['_id'],
+            data.get('resultId', None),
+            data['raceId'],
+            data.get('driverId'),
+            data.get('constructorId', None),
+            data.get('number', None),
+            data.get('grid', None),
+            data.get('position', None) if data.get('position', None) != '\\N' else None,
+            data.get('positionText'),
+            data.get('points', None),
+            data.get('time', None) if data.get('time', None) != '\\N' else None,
+            data.get('milliseconds', None) if data.get('milliseconds', None) != '\\N' else None,
+            data.get('fastestLap') if data.get('fastestLap', None) != '\\N' else None,
+            data.get('fastestLapTime') if data.get('fastestLapTime', None) != '\\N' else None,
+            data.get('statusId') if data.get('statusId', None) != '\\N' else None
+        ))
+    try:
+        cursor.executemany(
+            """
+            INSERT INTO results (
+                _id, resultId, raceId,driverid, constructorId, number, grid, position,positiontext, points, time,milliseconds,
+                fastestlap, rank, fastestLapTime,FastestLapSpeed,statusId
+
+            )
+            VALUES (%s, %s, %s, %s, %s, %s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+            """,
+            transformed_data
+        )
+        conn.commit()
+    except Exception as e:
+        print(f"Data migratie fout: {e}")
+        conn.rollback()
+
 def results():
     conn, cursor = db_connection()
 
@@ -392,7 +432,6 @@ def results():
     except Exception as e:
         print(f"Data migratie fout: {e}")
         conn.rollback()
-
 def status_data():
     conn, cursor = db_connection()
 
