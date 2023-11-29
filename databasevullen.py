@@ -380,11 +380,11 @@ def sprint_results():
         cursor.executemany(
             """
             INSERT INTO sprint_results (
-                _id, resultId, raceId,driverid, constructorId, number, grid, position,positiontext, points, time,milliseconds,
+                _id, resultId, raceId,driverid, constructorId, number, grid, position,positiontext,positionOrder, points,laps, time,milliseconds,
                 fastestlap, fastestLapTime,statusId
 
             )
-            VALUES (%s, %s, %s, %s, %s, %s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+            VALUES (%s, %s, %s, %s, %s, %s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
             """,
             transformed_data
         )
