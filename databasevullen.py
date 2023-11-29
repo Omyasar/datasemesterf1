@@ -365,14 +365,14 @@ def sprint_results():
             data.get('constructorId', None),
             data.get('number', None),
             data.get('grid', None),
-            data.get('position', None) if data.get('position', None) != '\\N' else None,
+            data.get('position', None),
             data.get('positionText'),
             data.get('points', None),
-            data.get('time', None) if data.get('time', None) != '\\N' else None,
-            data.get('milliseconds', None) if data.get('milliseconds', None) != '\\N' else None,
-            data.get('fastestLap') if data.get('fastestLap', None) != '\\N' else None,
-            data.get('fastestLapTime') if data.get('fastestLapTime', None) != '\\N' else None,
-            data.get('statusId') if data.get('statusId', None) != '\\N' else None
+            data.get('time', None),
+            data.get('milliseconds', None),
+            data.get('fastestLap'),
+            data.get('fastestLapTime'),
+            data.get('statusId'),
         ))
     try:
         cursor.executemany(
