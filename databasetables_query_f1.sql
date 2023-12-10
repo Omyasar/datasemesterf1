@@ -169,3 +169,26 @@ create table status(
     statusId integer,
     status varchar(255)
 );
+
+CREATE TABLE weather_data (
+    _id varchar(255) PRIMARY KEY,
+    time varchar(255) TIMESTAMP,
+    air_temp FLOAT,
+    humidity FLOAT,
+    pressure FLOAT,
+    rainfall BOOLEAN,
+    track_temp FLOAT,
+    wind_direction INT,
+    wind_speed FLOAT
+);
+
+CREATE TABLE weather_data (
+    Time TIME,
+    AirTemp FLOAT,
+    Humidity FLOAT,
+    Pressure FLOAT,
+    Rainfall BOOLEAN,
+    TrackTemp FLOAT,
+    WindDirection INT,
+    WindSpeed FLOAT
+);
