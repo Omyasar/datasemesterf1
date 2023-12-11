@@ -1,9 +1,7 @@
 import json
-
 import numpy as np
 import pandas as pd
 from fastf1.core import Session
-from pymongo import cursor
 from db_conn import db_connection
 import fastf1._api
 
@@ -207,12 +205,12 @@ def insert_weather_data(data):
         """
 
         cursor.execute(insert_query)
+        conn.commit()
+
 
 # Call the function to insert data into PostgreSQL
-weather_data_result = weather_data(Session.api_path)
-insert_weather_data(weather_data_result)
+session = fastf1.get_session(2021, 'Monza', 'Q')
+session.load()
 
-# Commit changes and close the connection
-conn.commit()
-cursor.close()
-conn.close()
+weather_data_result = session.weather_data
+insert_weather_data(weather_data_result)
