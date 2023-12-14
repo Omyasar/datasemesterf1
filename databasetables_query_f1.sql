@@ -183,12 +183,24 @@ CREATE TABLE weather_data (
 );
 
 CREATE TABLE weather_data (
-    Time TIME,
-    AirTemp FLOAT,
+    _id varchar(255) PRIMARY KEY,
+    Time text,
+    Air_Temp FLOAT,
     Humidity FLOAT,
     Pressure FLOAT,
     Rainfall BOOLEAN,
-    TrackTemp FLOAT,
-    WindDirection INT,
-    WindSpeed FLOAT
+    Track_Temp FLOAT,
+    Wind_Direction INT,
+    Wind_Speed FLOAT
+);
+
+CREATE TABLE car_data (
+    Date DATE
+    RPM INT,
+    Speed INT,
+    nGear INT,
+    Throttle INT,
+    Brake BOOLEAN,
+    DRS INT,
+    Source VARCHAR(255),
 );
