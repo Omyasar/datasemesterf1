@@ -1,0 +1,65 @@
+# The following code to create a dataframe and remove duplicated rows is always executed and acts as a preamble for your script: 
+
+# dataset = pandas.DataFrame(bocht, coureur, coureur2, gp, jaar, ronde)
+# dataset = dataset.drop_duplicates()
+
+# Paste or type your script code here:
+import pandas as pd
+import fastf1
+import numpy as np
+from matplotlib import pyplot as plt
+
+params = dataset.loc[0]
+jaar = params['jaar']
+gp = params['gp']
+sessie = "Race"
+ronde = params['ronde']
+coureur = params['coureur']
+coureur2 = params['coureur2']
+corner_number = params['bocht']
+
+session = fastf1.get_session(jaar, gp, sessie)
+session.load(laps=True)
+
+circuit_info = session.get_circuit_info()
+lap = session.laps.pick_driver(coureur).pick_lap(ronde)
+lap2 = session.laps.pick_driver(coureur2).pick_lap(ronde)
+pos = lap.get_pos_data()
+car_data = lap.get_car_data().add_distance()
+car_data2 = lap2.get_car_data().add_distance()
+corner_margin = 50
+
+label1 = lap['Driver'].to_string(index=False), lap['DriverNumber'].to_string(index=False)
+label2 = lap2['Driver'].to_string(index=False), lap2['DriverNumber'].to_string(index=False)
+
+corner = circuit_info.corners[circuit_info.corners == corner_number].iloc[0]
+
+corner = circuit_info.corners[circuit_info.corners['Number'] == corner_number].iloc[0]
+corner_distance = corner['Distance']
+
+def rotate(xy, *, angle):
+    rot_mat = np.array([[np.cos(angle), np.sin(angle)],
+                        [-np.sin(angle), np.cos(angle)]])
+    return np.matmul(xy, rot_mat)
+def create_plot_window(car_data, car_data2, corner_distance, corner_margin, label1, label2, gp, corner_number):
+    fig, ax = plt.subplots()
+    ax.plot(car_data['Distance'], car_data['Speed'], color="green", label=label1)
+    ax.plot(car_data2['Distance'], car_data2['Speed'], color="blue", label=label2)
+    v_min = car_data['Speed'].min()
+    v_max = car_data['Speed'].max()
+    ax.set_xlim(corner_distance - corner_margin, corner_distance + corner_margin)
+    ax.vlines(x=corner_distance, ymin=v_min-20, ymax=v_max+20, linestyle='dotted', color='grey')
+    ax.text(corner_distance, car_data['Speed'].min() - 30, corner_number,
+            va='center_baseline', ha='center', size='small')
+    ax.set_xlabel('Afstand in meters')
+    ax.set_ylabel('Snelheid in km/h')
+    ax.legend()
+    image_path = f'plot_{gp}_{corner_number}.png'
+    plt.savefig(image_path)
+    plt.close(fig)
+
+    return image_path
+
+image_path = create_plot_window(car_data, car_data2, corner_distance, corner_margin, label1, label2, gp, str(corner_number))
+image_path
+plt.show()
