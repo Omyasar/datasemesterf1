@@ -195,12 +195,12 @@ CREATE TABLE weather_data (
 );
 
 CREATE TABLE car_data (
-    Date DATE
-    RPM INT,
-    Speed INT,
-    nGear INT,
-    Throttle INT,
-    Brake BOOLEAN,
-    DRS INT,
-    Source VARCHAR(255),
+    Date varchar(255)
+    RPM varchar(255),
+    Speed varchar(255),
+    nGear varchar(255),
+    Throttle varchar(255),
+    Brake varchar(255),
+    DRS varchar(255),
+    Source VARCHAR(255)
 );
