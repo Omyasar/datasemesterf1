@@ -1,0 +1,51 @@
+import pandas as pd
+import fastf1
+import numpy as np
+from matplotlib import pyplot as plt
+
+# Assuming 'dataset' is defined somewhere before this code
+# dataset = pandas.DataFrame(bocht, coureur, gp, jaar)
+# dataset = dataset.drop_duplicates()
+
+params = dataset.loc[0]
+jaar = params['jaar']
+gp = params['gp']
+sessie = "Race"
+coureur = params['coureur']
+corner_number = params['bocht']
+
+session = fastf1.get_session(jaar, gp, sessie)
+session.load()
+
+circuit_info = session.get_circuit_info()
+lap = session.laps.pick_driver(coureur).pick_fastest()
+pos = lap.get_pos_data()
+car_data = lap.get_car_data().add_distance()
+corner_margin = 50
+
+label1 = f"{lap['Driver']} {lap['DriverNumber']}"
+
+corner = circuit_info.corners[circuit_info.corners['Number'] == corner_number].iloc[0]
+corner_distance = corner['Distance']
+
+def create_plot_window(car_data, corner_distance, corner_margin, label1, gp, corner_number):
+    fig, ax = plt.subplots()
+    ax.plot(car_data['Distance'], car_data['Speed'], color="green", label=label1)
+    v_min = car_data['Speed'].min()
+    v_max = car_data['Speed'].max()
+    ax.set_xlim(corner_distance - corner_margin, corner_distance + corner_margin)
+    ax.vlines(x=corner_distance, ymin=v_min-20, ymax=v_max+20, linestyle='dotted', color='grey')
+    ax.text(corner_distance, car_data['Speed'].min() - 30, corner_number,
+            va='center_baseline', ha='center', size='small')
+    ax.set_xlabel('Afstand in meters')
+    ax.set_ylabel('Snelheid in km/h')
+    ax.legend()
+    image_path = f'plot_{gp}_{corner_number}.png'
+    plt.savefig(image_path)
+    plt.close(fig)
+
+    return image_path
+
+image_path = create_plot_window(car_data, corner_distance, corner_margin, label1, gp, str(corner_number))
+image_path
+plt.show()
